@@ -1,44 +1,35 @@
 import React from "react";
 import { useState } from "react";
-import { Navigate, useLocation } from "react-router-dom";
-import { deleteCustomer, saveOrUpdateCustomer, updateCustomer } from "../../service/customer/customer.service";
+import {  useLocation } from "react-router-dom";
+
 import { Form, Button } from "react-bootstrap";
 import { Input } from "../common/Input";
 import { useNavigate } from "react-router-dom";
 import { BsArrowLeft } from "react-icons/bs";
 import "./customer.css";
 import { CustomToast } from "../common/Toast";
+import { useDispatch } from "react-redux";
+import { deleteCustomer ,updateCustomer} from "../../util/customer.slice";
 export const CustomerUpdate = () => {
   const location = useLocation();
-  const { customerTobeUpdated } = location.state;
+  const { toBeUpdated } = location.state;
+  const dispatch = useDispatch();
   let navigate = useNavigate();
-  //Fields that can be updated : email, address.
   const [status, setStatus] = useState(false);
-  const [customer, setCustomer] = useState(customerTobeUpdated);
+  const [customer, setCustomer] = useState(toBeUpdated);
   const handleDeleteCustomer = () => {
-    deleteCustomer(customerTobeUpdated.id)
-      .then(() => {
-        setStatus(true);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+    dispatch(deleteCustomer(toBeUpdated.id));
+    setStatus(true);
   };
   const handleChange = (e) => {
     var name = e.target.name;
     var value = e.target.value;
-    console.log(customer);
     setCustomer({ ...customer, [name]: value });
   };
   const handleSubmit = (e) => {
     e.preventDefault();
-    saveOrUpdateCustomer(customer,'update')
-      .then(() => {
-        setStatus(true);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+    dispatch(updateCustomer( customer));
+    setStatus(true);
   };
   const handleClose = () => {
     setStatus(false);

@@ -1,3 +1,23 @@
+.nav{
+  padding : 1em;
+  margin: 0.5em;
+  
+  align-items:center;
+}
+
+.edit-button{
+  float: left;
+}
+
+.display-item{
+
+font-size: 18px;
+color: #982430;
+padding: 0.5em;
+background-color: #437463
+
+}
+
 .nav-button {
   text-decoration: none;
   margin: 0.25em;

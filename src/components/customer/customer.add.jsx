@@ -1,12 +1,12 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
-import { saveOrUpdateCustomer } from "../../service/customer/customer.service"
-import { CustomToast } from "../common/Toast";
-import { Input } from "../common/Input";
-import { Navigate, useNavigate } from "react-router-dom";
 import { BsArrowLeft } from "react-icons/bs";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { saveCustomer } from "../../util/customer.slice";
+import { Input } from "../common/Input";
+import { CustomToast } from "../common/Toast";
 import "./customer.css";
 
 const customer = {
@@ -19,6 +19,7 @@ export const AddCustomer = () => {
   const [customerObj, setCustomerObj] = useState(customer);
   const [birthdateObj, setBirthdateObj] = useState(new Date());
   const [status, setStatus] = useState(false);
+  const dispatch= useDispatch();
 
   let navigate = useNavigate();
 
@@ -35,13 +36,8 @@ export const AddCustomer = () => {
   };
   const handleSubmit = (e) => {
     e.preventDefault();
-    saveOrUpdateCustomer(customerObj, "save")
-      .then(() => {
-        setStatus(true);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+    dispatch(saveCustomer(customerObj));
+    setStatus(true);
   };
   const getAge = (birthDate) =>
     Math.floor((new Date() - new Date(birthDate).getTime()) / 3.15576e10);

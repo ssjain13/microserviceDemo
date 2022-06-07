@@ -1,103 +1,48 @@
-import React, { useState } from "react";
-import { useEffect } from "react";
-import { getAllCustomers } from "../../service/customer/customer.service";
-import { Link } from "react-router-dom";
-import { Form } from "react-bootstrap";
+import AddIcon from "@mui/icons-material/Add";
+import { CircularProgress, Fab, Typography } from "@mui/material";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { getAllCustomers } from "../../util/customer.slice";
+import { CardLayout } from "../common/Card.layout";
 import "../customer/customer.css";
+import { SearchCustomer } from "./customer.search";
 
 export const Customer = () => {
-  const [customers, setCustomers] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [searchStr, setSearchStr] = useState("");
+  const { filtered, fields, loading } = useSelector((state) => state.customers);
+  const navigate = useNavigate();
 
+  const dispatch = useDispatch();
   useEffect(() => {
-    setLoading(true);
-    getAllCustomers().then((result) => {
-      setCustomers(result);
-      setLoading(false);
-    });
+    dispatch(getAllCustomers());
   }, []);
-
-  const search = (customers) => {
-    return customers.filter((customer) => {
-      return (
-        isPresent(customer.email) ||
-        isPresent(customer.name) ||
-        isPresent(customer.address)
-      );
-    });
-  };
-
-  const isPresent = (field) =>
-    field.toLowerCase().indexOf(searchStr.toLowerCase()) > -1;
 
   return (
     <>
       {loading ? (
-        <div>...Data Loading.....</div>
+        <CircularProgress />
       ) : (
         <div>
-          <Form.Control
-            placeholder="Search customer"
-            name="search"
-            type="text"
-            onChange={(e) => setSearchStr(e.target.value)}
-            value={searchStr}
-          />
-          <div
-            className="nav"
-            style={{ fontSize: "18px", color: "#98243", padding: "0.5em" }}
-          >
-            <Link to="/add" className="nav-button">
-              <p className="link-text">Add</p>
-            </Link>
-          </div>
-          {search(customers).map((customer) => (
-            <div
-              key={customer.id}
-              style={{
-                display: "flex",
-                background: "beige",
-                width: "60vw",
-                padding: "1em",
-                margin: "1em",
-              }}
-            >
-              <span
-                style={{ fontSize: "18px", color: "#98243", padding: "0.5em" }}
-              >
-                {customer.name}
-              </span>
-              <span
-                style={{ fontSize: "18px", color: "#98243", padding: "0.5em" }}
-              >
-                {customer.address}
-              </span>
-              <span
-                style={{ fontSize: "18px", color: "#98243", padding: "0.5em" }}
-              >
-                {customer.email}
-              </span>
-              <span
-                style={{ fontSize: "18px", color: "#98243", padding: "0.5em" }}
-              >
-                {customer.age}
-              </span>
+          <div className="nav">
+            <SearchCustomer />
 
-              <div
-                className="nav"
-                style={{ fontSize: "18px", color: "#98243", padding: "0.5em" }}
-              >
-                <Link
-                  className="nav-button"
-                  to="/update"
-                  state={{ customerTobeUpdated: customer }}
-                >
-                  <p className="link-text">Update</p>
-                </Link>
-              </div>
-            </div>
-          ))}
+            <Fab
+              color="primary"
+              aria-label="add"
+              size="small"
+              onClick={() => navigate("/add")}
+            >
+              <AddIcon />
+            </Fab>
+          </div>
+          {filtered.length < 1 && (
+            <Typography variant="h6">No data!</Typography>
+          )}
+          <div style={{ display: "flex", flexWrap: "wrap" }}>
+            {filtered.map((customer) => (
+              <CardLayout data={customer} fields={fields} />
+            ))}
+          </div>
         </div>
       )}
     </>
